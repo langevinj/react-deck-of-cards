@@ -3,37 +3,41 @@ import './Deck.css'
 import axios from "axios";
 import Card from './Card'
 
-const Deck = ({deck_id}) => {
-    const[remainingCards, setRemainingCards] = useState(52)
-    const[card, setCard] = useState(null)
-    const[cardsRemain, setCardsRemain] = useState(true)
+const Deck = () => {
+    const [deck, setDeck] = useState(null)
+    const[autoDraw, setautoDraw] = useState(false)
     const[drawn, setDrawn] = useState([])
 
-    const drawCard = () => {
-        if(remainingCards >= 1){
-            setRemainingCards(c => c - 1)
-            console.log(`Remaining cards: ${remainingCards}`)
-        } else {
-            setCardsRemain(false)
+    //get the deck when the page loads
+    useEffect(() => {
+        async function loadDeck() {
+            const res = await axios.get("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1");
+            console.log(res.data)
+            setDeck(res.data.deck_id);
         }
-    }
+        loadDeck();
+    }, [])
 
     useEffect(() => {
             async function drawNewCard() {
-                const res = await axios.get(`https://deckofcardsapi.com/api/deck/${deck_id}/draw/?count=1`)
+                const res = await axios.get(`https://deckofcardsapi.com/api/deck/${deck}/draw/?count=1`)
                 const card = res.data.cards[0];
-                setCard(card.image)
                 setDrawn(drawn => [...drawn, {id: card.code, image: card.image, suit: card.suit + " " + card.value}])
             }
             drawNewCard(); 
-        }, [remainingCards])
+        }, [autoDraw])
 
     const cards = drawn.map(d => (<Card id={d.id} image={d.image} />))
 
+    function toggleAutoDraw(){
+        autoDraw ? setautoDraw(false) : setautoDraw(true)
+    }
+
     return (
-        <div className="Container">
+        <div>
+            <h1>{deck ? "You deck is ready" : "Shuffling..."}</h1>
             <div>
-                {cardsRemain ? <button className="Deck-drawbutton" onClick={drawCard}>Draw a card!</button> : <h2>Out of cards!</h2>}
+                {drawn.length !== 52 ? <button className="Deck-drawbutton" onClick={toggleAutoDraw}>Draw a card!</button> : <h2>Out of cards!</h2>}
             </div>
             <div className="Card-container">
                 {cards}

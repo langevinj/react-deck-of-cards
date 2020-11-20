@@ -1,10 +1,10 @@
 import './App.css';
+import Deck from './Deck'
 
-import DeckViewer from './DeckViewer'
 function App() {
   return (
     <div className="App">
-      <DeckViewer />
+      <Deck />
     </div>
   );
 }
