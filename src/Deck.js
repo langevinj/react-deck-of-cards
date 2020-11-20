@@ -52,11 +52,19 @@ const Deck = () => {
         autoDraw ? setautoDraw(false) : setautoDraw(true);
     }
 
+    //shuffle the current deck and remove cards already placed by reseting drawn
+    const shuffleDeck = async () => {
+        await axios.get(`https://deckofcardsapi.com/api/deck/${deck}/shuffle/`);
+        setDrawn([])
+        setautoDraw(false)
+    }
+
     return (
         <div>
             <h1>{deck ? "You deck is ready" : "Shuffling..."}</h1>
             <div>
                 {autoDraw ? <button className="Deck-stopdrawbutton" onClick={toggleAutoDraw}>Stop Drawing</button> : <button className="Deck-drawbutton" onClick={toggleAutoDraw}>Start drawing!</button>}
+                <button className="Deck-shuffle" onClick={shuffleDeck}>Shuffle Up!</button>
             </div>
             <div className="Card-container">
                 {cards}
