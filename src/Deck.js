@@ -37,7 +37,7 @@ const Deck = () => {
 
             if(autoDraw && !timerRef.current){
                 timerRef.current = setInterval(async () => {
-                    await drawNewCard();}, 100)
+                    await drawNewCard();}, 1000)
             }
 
             return () => {
