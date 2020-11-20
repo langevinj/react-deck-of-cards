@@ -3,6 +3,8 @@ import './Deck.css'
 import axios from "axios";
 import Card from './Card'
 
+const BASE_URL = "https://deckofcardsapi.com/api/deck"
+
 const Deck = () => {
     const [deck, setDeck] = useState(null)
     const[autoDraw, setautoDraw] = useState(false)
@@ -12,7 +14,7 @@ const Deck = () => {
     //get the deck when the page loads
     useEffect(() => {
         async function loadDeck() {
-            const res = await axios.get("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1");
+            const res = await axios.get(`${BASE_URL}/new/shuffle/?deck_count=1`);
             setDeck(res.data.deck_id);
         }
         loadDeck();
@@ -22,12 +24,14 @@ const Deck = () => {
     useEffect(() => {
             async function drawNewCard() {
                 try{
-                    const res = await axios.get(`https://deckofcardsapi.com/api/deck/${deck}/draw/?count=1`)
+                    //"draw" a card from the API
+                    const res = await axios.get(`${BASE_URL}/${deck}/draw/?count=1`)
                     if(res.data.remaining === 0){
                         setautoDraw(false)
                         throw new Error("NO CARDS REMAINING!")
                     }
                     const card = res.data.cards[0];
+                    //add card to the "drawn" list
                     setDrawn(drawn => [...drawn, { id: card.code, image: card.image, suit: card.suit + " " + card.value }])
                 } catch (err) {
                     toggleAutoDraw()
@@ -37,7 +41,8 @@ const Deck = () => {
 
             if(autoDraw && !timerRef.current){
                 timerRef.current = setInterval(async () => {
-                    await drawNewCard();}, 1000)
+                    await drawNewCard();
+                }, 1000)
             }
 
             return () => {
@@ -54,7 +59,7 @@ const Deck = () => {
 
     //shuffle the current deck and remove cards already placed by reseting drawn
     const shuffleDeck = async () => {
-        await axios.get(`https://deckofcardsapi.com/api/deck/${deck}/shuffle/`);
+        await axios.get(`${BASE_URL}/${deck}/shuffle/`);
         setDrawn([])
         setautoDraw(false)
     }
